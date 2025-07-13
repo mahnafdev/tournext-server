@@ -37,6 +37,13 @@ const run_api = async () => {
 		// Define collections
 		const usersColl = db.collection("users");
 		const toursColl = db.collection("tours");
+		//* API Routes
+		// GET: Fetch all or filtered users
+		app.get("/users", async (req, res) => {
+			const query = {};
+			const result = await usersColl.find(query).toArray();
+			res.send(result);
+		});
 		// Ping for successful connection confirmation
 		await db_client.db("admin").command({ ping: 1 });
 		console.log("Pinged. Connected to MongoDB!");
