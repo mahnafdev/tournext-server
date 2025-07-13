@@ -63,6 +63,12 @@ const run_api = async () => {
 			const result = await toursColl.find(query).toArray();
 			res.send(result);
 		});
+		// POST: Create & insert a tour
+		app.post("/tours", async (req, res) => {
+			const newTour = req.body;
+			const result = await toursColl.insertOne(newTour);
+			res.status(201).send(result);
+		});
 		// Ping for successful connection confirmation
 		await db_client.db("admin").command({ ping: 1 });
 		console.log("Pinged. Connected to MongoDB!");
