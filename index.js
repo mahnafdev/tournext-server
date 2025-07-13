@@ -44,6 +44,12 @@ const run_api = async () => {
 			const result = await usersColl.find(query).toArray();
 			res.send(result);
 		});
+		// POST: Create & insert a user
+		app.post("/users", async (req, res) => {
+			const newUser = req.body;
+			const result = await usersColl.insertOne(newUser);
+			res.status(201).send(result);
+		});
 		// Ping for successful connection confirmation
 		await db_client.db("admin").command({ ping: 1 });
 		console.log("Pinged. Connected to MongoDB!");
