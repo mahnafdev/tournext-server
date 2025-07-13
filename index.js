@@ -57,6 +57,12 @@ const run_api = async () => {
 			const result = await usersColl.deleteOne(query);
 			res.status(204).send(result);
 		});
+		// GET: Fetch all or filtered tours
+		app.get("/tours", async (req, res) => {
+			const query = {};
+			const result = await toursColl.find(query).toArray();
+			res.send(result);
+		});
 		// Ping for successful connection confirmation
 		await db_client.db("admin").command({ ping: 1 });
 		console.log("Pinged. Connected to MongoDB!");
