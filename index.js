@@ -11,7 +11,8 @@ dotenv();
 app.use(express.json());
 app.use(
 	cors({
-		origin: ["http://localhost:5173"],
+		origin: "http://localhost:5173",
+		credentials: true,
 	}),
 );
 
@@ -61,6 +62,13 @@ const run_api = async () => {
 		app.get("/tours", async (req, res) => {
 			const query = {};
 			const result = await toursColl.find(query).toArray();
+			res.send(result);
+		});
+		// GET: Fetch a tour
+		app.get("/tours/:tour_id", async (req, res) => {
+			const tourId = req.params.tour_id;
+			const query = { tour_id: tourId };
+			const result = await toursColl.findOne(query);
 			res.send(result);
 		});
 		// POST: Create & insert a tour
