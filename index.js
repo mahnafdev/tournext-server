@@ -60,6 +60,13 @@ const run_api = async () => {
 		});
 		// GET: Fetch all or filtered tours
 		app.get("/tours", async (req, res) => {
+			const { random } = req.query;
+			if (random) {
+				const result = await toursColl
+					.aggregate([{ $sample: { size: parseInt(random) } }])
+					.toArray();
+				return res.send(result);
+			}
 			const query = {};
 			const result = await toursColl.find(query).toArray();
 			res.send(result);
