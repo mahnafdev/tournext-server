@@ -41,13 +41,25 @@ const run_api = async () => {
 		//* API Routes
 		// GET: Fetch all or filtered users
 		app.get("/users", async (req, res) => {
+			const { email, role, search } = req.query;
 			const query = {};
+			email ? (query.email = email) : query;
+			role ? (query.role = role) : query;
+			if (search) {
+				query.$or = [
+					{ full_name: { $regex: search, $options: "i" } },
+					{ email: { $regex: search, $options: "i" } },
+				];
+			}
 			const result = await usersColl.find(query).toArray();
 			res.send(result);
 		});
 		// POST: Create & insert a user
 		app.post("/users", async (req, res) => {
 			const newUser = req.body;
+			const { email } = newUser;
+			const isUserExists = await usersColl.findOne({ email });
+			if (isUserExists) return res.send({ inserted: false });
 			const result = await usersColl.insertOne(newUser);
 			res.status(201).send(result);
 		});
