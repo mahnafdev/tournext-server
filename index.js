@@ -38,6 +38,7 @@ const run_api = async () => {
 		// Define collections
 		const usersColl = db.collection("users");
 		const toursColl = db.collection("tours");
+		const tourGuidesColl = db.collection("tour_guides");
 		//* API Routes
 		// GET: Fetch all or filtered users
 		app.get("/users", async (req, res) => {
@@ -69,6 +70,12 @@ const run_api = async () => {
 			const query = { _id: new ObjectId(id) };
 			const result = await usersColl.deleteOne(query);
 			res.status(204).send(result);
+		});
+		// POST: Create & insert a tourGuide
+		app.post("/tour-guides", async (req, res) => {
+			const newTourGuide = req.body;
+			const result = await tourGuidesColl.insertOne(newTourGuide);
+			res.status(201).send(result);
 		});
 		// GET: Fetch all or filtered tours
 		app.get("/tours", async (req, res) => {
