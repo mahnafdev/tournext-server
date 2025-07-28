@@ -71,6 +71,15 @@ const run_api = async () => {
 			const result = await usersColl.deleteOne(query);
 			res.status(204).send(result);
 		});
+		// GET: Fetch all or filtered tourGuides
+		app.get("/tour-guides", async (req, res) => {
+			const { status, country } = req.query;
+			const query = {};
+			status ? (query.status = status) : query;
+			country ? (query.country = country) : query;
+			const result = await tourGuidesColl.find(query).toArray();
+			res.send(result);
+		});
 		// POST: Create & insert a tourGuide
 		app.post("/tour-guides", async (req, res) => {
 			const newTourGuide = req.body;
