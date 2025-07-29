@@ -11,7 +11,7 @@ dotenv();
 app.use(express.json());
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: ["http://localhost:5173", "https://tournext-ada60.web.app"],
 		credentials: true,
 	}),
 );
@@ -32,7 +32,7 @@ const db_client = new MongoClient(db_uri, {
 const run_api = async () => {
 	try {
 		// Client connection with server (turn off in deployment)
-		await db_client.connect();
+		// await db_client.connect();
 		// Define database
 		const db = db_client.db("tournext");
 		// Define collections
@@ -63,6 +63,29 @@ const run_api = async () => {
 			if (isUserExists) return res.send({ inserted: false });
 			const result = await usersColl.insertOne(newUser);
 			res.status(201).send(result);
+		});
+		app.patch("/accept-tour-guide", async (req, res) => {
+			const { user_email, guide_id, status } = req.body;
+			const updateUser = await usersColl.updateOne(
+				{ email: user_email },
+				{ $set: { role: "Tour Guide" } },
+			);
+			const updateGuide = await tourGuidesColl.updateOne(
+				{ guide_id },
+				{ $set: { status: "accepted" } },
+			);
+			res.send({
+				updateUser,
+				updateGuide,
+			});
+		});
+		app.patch("/reject-tour-guide/:guide_id", async (req, res) => {
+			const { guide_id } = req.params;
+			const updatedGuide = await tourGuidesColl.updateOne(
+				{ guide_id },
+				{ $set: { status: "rejected" } },
+			);
+			res.send(updatedGuide);
 		});
 		// DELETE: Delete a user
 		app.delete("/users/:id", async (req, res) => {
@@ -120,8 +143,8 @@ const run_api = async () => {
 			res.status(204).send(result);
 		});
 		// Ping for successful connection confirmation
-		await db_client.db("admin").command({ ping: 1 });
-		console.log("Pinged. Connected to MongoDB!");
+		// await db_client.db("admin").command({ ping: 1 });
+		// console.log("Pinged. Connected to MongoDB!");
 	} finally {
 		// Don't close client connection with server
 		// await client.close();
