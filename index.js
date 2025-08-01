@@ -39,6 +39,7 @@ const run_api = async () => {
 		const usersColl = db.collection("users");
 		const toursColl = db.collection("tours");
 		const tourGuidesColl = db.collection("tour_guides");
+		const storiesColl = db.collection("stories");
 		//* API Routes
 		// GET: Fetch all or filtered users
 		app.get("/users", async (req, res) => {
@@ -64,6 +65,7 @@ const run_api = async () => {
 			const result = await usersColl.insertOne(newUser);
 			res.status(201).send(result);
 		});
+		// PATCH: Accept an User as Tour Guide
 		app.patch("/accept-tour-guide", async (req, res) => {
 			const { user_email, guide_id, status } = req.body;
 			const updateUser = await usersColl.updateOne(
@@ -79,6 +81,7 @@ const run_api = async () => {
 				updateGuide,
 			});
 		});
+		// PATCH: Reject an User as Tour Guide
 		app.patch("/reject-tour-guide/:guide_id", async (req, res) => {
 			const { guide_id } = req.params;
 			const updatedGuide = await tourGuidesColl.updateOne(
@@ -96,8 +99,9 @@ const run_api = async () => {
 		});
 		// GET: Fetch all or filtered tourGuides
 		app.get("/tour-guides", async (req, res) => {
-			const { status, country } = req.query;
+			const { guide_id, status, country } = req.query;
 			const query = {};
+			guide_id ? (query.guide_id = guide_id) : query;
 			status ? (query.status = status) : query;
 			country ? (query.country = country) : query;
 			const result = await tourGuidesColl.find(query).toArray();
@@ -141,6 +145,12 @@ const run_api = async () => {
 			const query = { _id: new ObjectId(id) };
 			const result = await toursColl.deleteOne(query);
 			res.status(204).send(result);
+		});
+		// POST: Create & insert a story
+		app.post("/stories", async (req, res) => {
+			const newStory = req.body;
+			const result = storiesColl.insertOne(newStory);
+			res.status(201).send(result);
 		});
 		// Ping for successful connection confirmation
 		// await db_client.db("admin").command({ ping: 1 });
