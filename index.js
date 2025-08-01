@@ -147,6 +147,14 @@ const run_api = async () => {
 			const result = await toursColl.deleteOne(query);
 			res.status(204).send(result);
 		});
+		// GET: Fetch all or filtered bookings
+		app.get("/bookings", async (req, res) => {
+			const { tourist_email } = req.query;
+			const query = {};
+			tourist_email ? (query.tourist_email = tourist_email) : query;
+			const result = await bookingsColl.find(query).toArray();
+			res.send(result);
+		});
 		// POST: Create & insert a booking
 		app.post("/bookings", async (req, res) => {
 			const newBooking = req.body;
