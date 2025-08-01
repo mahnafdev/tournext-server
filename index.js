@@ -32,12 +32,13 @@ const db_client = new MongoClient(db_uri, {
 const run_api = async () => {
 	try {
 		// Client connection with server (turn off in deployment)
-		// await db_client.connect();
+		await db_client.connect();
 		// Define database
 		const db = db_client.db("tournext");
 		// Define collections
 		const usersColl = db.collection("users");
 		const toursColl = db.collection("tours");
+		const bookingsColl = db.collection("bookings");
 		const tourGuidesColl = db.collection("tour_guides");
 		const storiesColl = db.collection("stories");
 		//* API Routes
@@ -146,6 +147,12 @@ const run_api = async () => {
 			const result = await toursColl.deleteOne(query);
 			res.status(204).send(result);
 		});
+		// POST: Create & insert a booking
+		app.post("/bookings", async (req, res) => {
+			const newBooking = req.body;
+			const result = bookingsColl.insertOne(newBooking);
+			res.status(201).send(result);
+		});
 		// POST: Create & insert a story
 		app.post("/stories", async (req, res) => {
 			const newStory = req.body;
@@ -153,8 +160,8 @@ const run_api = async () => {
 			res.status(201).send(result);
 		});
 		// Ping for successful connection confirmation
-		// await db_client.db("admin").command({ ping: 1 });
-		// console.log("Pinged. Connected to MongoDB!");
+		await db_client.db("admin").command({ ping: 1 });
+		console.log("Pinged. Connected to MongoDB!");
 	} finally {
 		// Don't close client connection with server
 		// await client.close();
