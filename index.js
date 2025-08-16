@@ -116,7 +116,7 @@ const run_api = async () => {
 		});
 		// GET: Fetch all or filtered tours
 		app.get("/tours", async (req, res) => {
-			const { random } = req.query;
+			const { random, sort } = req.query;
 			if (random) {
 				const result = await toursColl
 					.aggregate([{ $sample: { size: parseInt(random) } }])
@@ -124,7 +124,9 @@ const run_api = async () => {
 				return res.send(result);
 			}
 			const query = {};
-			const result = await toursColl.find(query).toArray();
+			const sortQuery = {};
+			sort && sort !== "0" ? (sortQuery["tour.price"] = parseInt(sort)) : sortQuery;
+			const result = await toursColl.find(query).sort(sortQuery).toArray();
 			res.send(result);
 		});
 		// GET: Fetch a tour
