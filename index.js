@@ -184,6 +184,13 @@ const run_api = async () => {
 			const result = storiesColl.insertOne(newStory);
 			res.status(201).send(result);
 		});
+		// DELETE: Delete a story
+		app.delete("/stories/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: new ObjectId(id) };
+			const result = await storiesColl.deleteOne(query);
+			res.status(204).send(result);
+		});
 		// Ping for successful connection confirmation (turn off in deployment)
 		await db_client.db("admin").command({ ping: 1 });
 		console.log("Pinged. Connected to MongoDB!");
